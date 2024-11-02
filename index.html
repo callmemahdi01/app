@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاسبه‌گر وام و سپرده</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/gh/mahmoud-eskandari/NumToPersian/dist/num2persian-min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', Arial, sans-serif;
+            background: linear-gradient(135deg, #f6f8f9 0%, #e5ebee 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            direction: rtl;
+            line-height: 1.6;
+        }
+
+        .calculator {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            transition: all 0.3s ease;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            gap: 10px;
+        }
+
+        .tab-button {
+            background: #f4f6f7;
+            border: 2px solid #e0e0e0;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Vazirmatn', Arial, sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            color: #34495e;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-button i {
+            color: #3498db;
+        }
+
+        .tab-button.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .tab-button.active i {
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            appearance: textfield;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .persian-text {
+            font-size: 0.8rem;
+            color: #2980b9;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .results {
+            background-color: #f4f6f7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .results p {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .results p span:last-child {
+            font-weight: bold;
+            color: #2980b9;
+        }
+
+        .calculator-content {
+            display: none;
+        }
+
+        .calculator-content.active {
+            display: block;
+        }
+        .about {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #3498db;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    color: #e5ebee;
+}
+
+.about:hover {
+    background-color: #2980b9;
+}
+        @media (max-width: 480px) {
+            .calculator {
+                margin: 15px;
+                padding: 20px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchCalculator('loan')">
+                <!-- <i class="fas fa-calculator"></i> -->
+                محاسبه اقساط وام
+            </button>
+            <button class="tab-button" onclick="switchCalculator('deposit')">
+                <!-- <i class="fas fa-piggy-bank"></i> -->
+                محاسبه‌ سود سپرده
+            </button>
+        </div>
+
+        <!-- محاسبه‌گر وام -->
+        <div id="loanCalculator" class="calculator-content active">
+            <div class="form-group">
+                <label for="loanAmount">مبلغ وام (ریال):</label>
+                <input type="number" id="loanAmount" min="10000000" placeholder="مثال: ۱۰۰,۰۰۰,۰۰۰" oninput="calculateLoan()">
+                <span class="persian-text" id="loanAmountText"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="loanDuration">مدت بازپرداخت (ماه):</label>
+                <input type="number" id="loanDuration" min="1" max="360" value="12" placeholder="از ۱ تا ۳۶۰ ماه" oninput="calculateLoan()">
+            </div>
+            
+            <div class="form-group">
+                <label for="loanInterestRate">نرخ سود سالانه (%):</label>
+                <input type="number" id="loanInterestRate" min="0" max="100" step="0.1" value="18" placeholder="مثال: ۱۸%" oninput="calculateLoan()">
+            </div>
+            
+            <div class="results">
+                <p>
+                    <span>مبلغ هر قسط:</span>
+                    <span id="installmentAmount">۰</span>
+                </p>
+                <p>
+                    <span>کل بازپرداخت:</span>
+                    <span id="totalRepayment">۰</span>
+                </p>
+                <p>
+                    <span>کل سود پرداختی:</span>
+                    <span id="totalInterest">۰</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- محاسبه‌گر سپرده -->
+        <div id="depositCalculator" class="calculator-content">
+            <div class="form-group">
+                <label for="depositAmount">مبلغ سپرده (ریال):</label>
+                <input type="number" id="depositAmount" min="10000000" placeholder="مثال: ۱۰۰,۰۰۰,۰۰۰" oninput="calculateDeposit()">
+                <span class="persian-text" id="depositAmountText"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="depositInterestRate">نرخ سود سالانه (%):</label>
+                <input type="number" id="depositInterestRate" min="0" max="100" step="0.1" value="18" placeholder="مثال: ۱۸%" oninput="calculateDeposit()">
+            </div>
+            
+            <div class="results">
+                <p>
+                    <span>سود روزانه:</span>
+                    <span id="dailyInterest">۰</span>
+                </p>
+                <p>
+                    <span>سود ماهانه:</span>
+                    <span id="monthlyInterest">۰</span>
+                </p>
+                <p>
+                    <span>سود سالانه:</span>
+                    <span id="annualInterest">۰</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="about">
+        <a href="https://callmemahdi01.github.io/about/">درباره</a>
+    </div>
+    <script>
+        function convertToTomanText(rialAmount) {
+            if (!rialAmount || isNaN(rialAmount)) return '';
+            // تبدیل به تومان با حذف یک صفر
+            const tomanAmount = Math.floor(rialAmount / 10);
+            return Num2persian(tomanAmount) + ' تومان';
+        }
+
+        function switchCalculator(type) {
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            document.getElementById('loanCalculator').classList.toggle('active', type === 'loan');
+            document.getElementById('depositCalculator').classList.toggle('active', type === 'deposit');
+        }
+
+        function calculateLoan() {
+            const loanAmount = parseFloat(document.getElementById('loanAmount').value) || 0;
+            const loanDuration = parseInt(document.getElementById('loanDuration').value) || 0;
+            const annualInterestRate = parseFloat(document.getElementById('loanInterestRate').value) || 0;
+
+            // نمایش مبلغ وام به حروف
+            document.getElementById('loanAmountText').innerText = convertToTomanText(loanAmount);
+
+            if (loanAmount && loanDuration && annualInterestRate) {
+                // محاسبه نرخ بهره ماهانه
+                const monthlyRate = (annualInterestRate / 100) / 12;
+                
+                // محاسبه قسط ماهانه با فرمول وام
+                const monthlyPayment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, loanDuration)) / 
+                                     (Math.pow(1 + monthlyRate, loanDuration) - 1);
+                
+                const totalPayment = monthlyPayment * loanDuration;
+                const totalInterest = totalPayment - loanAmount;
+
+                document.getElementById('installmentAmount').innerText = Math.round(monthlyPayment).toLocaleString('fa-IR') + ' ریال';
+                document.getElementById('totalRepayment').innerText = Math.round(totalPayment).toLocaleString('fa-IR') + ' ریال';
+                document.getElementById('totalInterest').innerText = Math.round(totalInterest).toLocaleString('fa-IR') + ' ریال';
+            } else {
+                document.getElementById('installmentAmount').innerText = '۰ ریال';
+                document.getElementById('totalRepayment').innerText = '۰ ریال';
+                document.getElementById('totalInterest').innerText = '۰ ریال';
+            }
+        }
+
+        function calculateDeposit() {
+            const depositAmount = parseFloat(document.getElementById('depositAmount').value) || 0;
+            const annualInterestRate = parseFloat(document.getElementById('depositInterestRate').value) || 0;
+
+            // نمایش مبلغ سپرده به حروف
+            document.getElementById('depositAmountText').innerText = convertToTomanText(depositAmount);
+
+            if (depositAmount && annualInterestRate) {
+                const annualInterest = depositAmount * (annualInterestRate / 100);
+                const monthlyInterest = annualInterest / 12;
+                const dailyInterest = annualInterest / 365;
+
+                document.getElementById('dailyInterest').innerText = Math.round(dailyInterest).toLocaleString('fa-IR') + ' ریال';
+                document.getElementById('monthlyInterest').innerText = Math.round(monthlyInterest).toLocaleString('fa-IR') + ' ریال';
+                document.getElementById('annualInterest').innerText = Math.round(annualInterest).toLocaleString('fa-IR') + ' ریال';
+            } else {
+                document.getElementById('dailyInterest').innerText = '۰ ریال';
+                document.getElementById('monthlyInterest').innerText = '۰ ریال';
+                document.getElementById('annualInterest').innerText = '۰ ریال';
+            }
+        }
+
+        // اجرای اولیه محاسبات
+        calculateLoan();
+        calculateDeposit();
+    </script>
+</body>
+</html>
